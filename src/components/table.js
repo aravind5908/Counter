@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Link } from 'react-router-dom';
 
 function CalendarTable({ numberOfDays }) {
   const [activeNumbers, setActiveNumbers] = useState([]);
@@ -9,6 +10,9 @@ function CalendarTable({ numberOfDays }) {
   const [count, setCount] = useState(1);
   const [confirmationStep, setConfirmationStep] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
+
+  // Create refs for each number
+  const numberRefs = useRef([]);
 
   // Create rows of 10 numbers each
   const rows = [];
@@ -44,6 +48,11 @@ function CalendarTable({ numberOfDays }) {
       setActiveNumbers([...activeNumbers, nextNumber]);
       setCurrentNumber(nextNumber);
       setNextNumber(nextNumber + 1);
+
+      // Focus on the next number
+      if (numberRefs.current[nextNumber]) {
+        numberRefs.current[nextNumber].focus();
+      }
 
       // Check if a full cycle is completed
       if (nextNumber % 10 === 0) {
@@ -117,6 +126,8 @@ function CalendarTable({ numberOfDays }) {
                       key={index} 
                       align="center"
                       onClick={() => number && handleCellClick(number)}
+                      ref={(el) => (numberRefs.current[number] = el)}
+                      tabIndex={isNext ? 0 : -1}
                       sx={{
                         fontWeight: number ? 'normal' : 'light',
                         color: isActive ? 'white' : (number ? 'text.primary' : 'text.disabled'),
@@ -222,7 +233,26 @@ function CalendarTable({ numberOfDays }) {
           </Button>
         </DialogActions>
       </Dialog>
-
+      <br/>
+      <div className="flex justify-center gap-4 mt-4">
+        <Button 
+          variant="contained" 
+          color="primary"
+          component={Link}
+          to="/"
+          size="large"
+          sx={{ 
+            minWidth: '120px',
+            py: 1.5,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            '&:hover': {
+              boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+            }
+          }}
+        >
+          Go To Start Screen
+        </Button>
+      </div>
       <style global="true">{`
         @keyframes pulse {
           0% { transform: scale(1); opacity: 1; }
